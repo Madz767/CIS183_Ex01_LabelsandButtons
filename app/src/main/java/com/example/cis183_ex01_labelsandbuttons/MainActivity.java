@@ -21,6 +21,8 @@ public class MainActivity extends AppCompatActivity
     TextView tv_j_greeting;
     EditText et_j_name;
     Button btn_j_getName;
+    TextView tv_j_errorMessage;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -42,7 +44,8 @@ public class MainActivity extends AppCompatActivity
         //make the connection between xml GUI elements and java
         tv_j_greeting = findViewById(R.id.tv_v_greeting);
         et_j_name = findViewById(R.id.et_v_name);
-        btn_j_getName = findViewById((R.id.btn_v_getGreeting));
+        btn_j_getName = findViewById(R.id.btn_v_getGreeting);
+        tv_j_errorMessage = findViewById(R.id.tv_v_dataEntryError);
 
         //setGreetingMessage();
         //call listeners
@@ -64,8 +67,21 @@ public class MainActivity extends AppCompatActivity
             public void onClick(View v)
             {
                 //Log.d("--Debug--","Begin button has been pressed!");
-                String message = createGreetingMessage();
-                setGreetingMessage(message);
+                if(inputValidation())
+                {
+                    //user entered a valid name
+                    String message = createGreetingMessage();
+                    setGreetingMessage(message);
+                    tv_j_errorMessage.setVisibility(TextView.INVISIBLE);
+                    btn_j_getName.setEnabled(false);
+                    et_j_name.setEnabled(false);
+                }
+                else
+                {
+                    //user did not enter valid name
+                    tv_j_errorMessage.setVisibility(TextView.VISIBLE);
+                }
+                clearNameTextBox();
             }
         });
     }
@@ -85,11 +101,51 @@ public class MainActivity extends AppCompatActivity
         tv_j_greeting.setVisibility(TextView.VISIBLE);
         tv_j_greeting.setText(message);
     }
-    //textbox needs to be cleared after button has been pressed
-    //only show message if name was entered
-    //validate name
-    //3 error message:
-        //names do not contain numbers/special characters/whitespace characters
-        //name was entered
+
+    public void clearNameTextBox()
+    {
+        et_j_name.setText("");
+    }
+
+    public boolean inputValidation()
+    {
+        boolean validUserInput = true;
+        String name = et_j_name.getText().toString();
+
+        if(name.isEmpty())
+        {
+            return false;
+        }
+        else if(containsNoAlphaNumeric(name))
+        {
+            //Log.d("ERROR: ","Names should not contain alpha text");
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }
+
+    public boolean containsNoAlphaNumeric(String name)
+    {
+        String specials = "`~!@#$%^&*()-_=+[{]}|;:,<>.?/1234567890";
+        for(int i = 0; i < name.length(); i++)
+        {
+            for (int j = 0; j < specials.length(); j++)
+            {
+                if(name.charAt(i)== specials.charAt(j))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+
+    }
+
+
+
+
     //only one greeting per run
 }
